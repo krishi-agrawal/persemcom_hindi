@@ -1,0 +1,21 @@
+# Stage 1 (channel codec, MSE) and Stage 2 (joint, CTC) of Algorithm 1 over Rayleigh block fading.
+init_from: checkpoints/asr/best.pt
+model:
+  channel: rayleigh
+  fading_block: frame    # one h ~ CN(0,1) per 32-symbol frame; "sample" = quasi-static per utterance
+  # perfect CSI (paper assumption). MMSE rather than zero forcing: ZF noise blow-ups in deep fades
+  # dominated Stage-1 training (codec MSE floor 0.40 vs 0.10 for MMSE at 20 dB in the smoke test).
+  equalizer: mmse
+  codec_hidden: 256
+  n_symbols: 32
+snr_db: {low: -10.0, high: 20.0}
+stage1:
+  lr: 1.0e-3
+  max_epochs: 10
+  ckpt_dir: checkpoints/rayleigh/stage1
+stage2:
+  lr: 1.0e-4
+  max_epochs: 20
+  select_snr_db: 10
+  ckpt_dir: checkpoints/rayleigh/stage2
+amp: true

@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.pytest_cache/
+
+# large / generated
+data/
+features/
+manifests/
+artifacts/
+checkpoints/
+runs/
+results/
+*.wav
+*.flac
+*.npy
+*.pt

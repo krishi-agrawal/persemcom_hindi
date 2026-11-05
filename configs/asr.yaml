@@ -1,0 +1,36 @@
+# Pretraining of the semantic codec (f_alpha + m^-1_delta) on clean features. Paper Sec. V-A.
+data:
+  train_manifest: manifests/train.jsonl
+  val_manifest: manifests/val.jsonl
+  # 1000 pieces, not the paper's 5000: with only 65 h of Hindi the 5000-piece run collapsed to
+  # all-blank CTC output (99.6% blank frames, WER 97% after 9 epochs). See runs/asr_failed_vocab5000.log.
+  tokenizer: artifacts/spm_hi_1000.model
+  feat_dir: features/fbank
+  cmvn: artifacts/fbank_cmvn.npz
+  min_duration: 1.0
+  max_duration: 25.0
+  max_batch_seconds: 400   # duration-bucketed batches, sized for 12 GB with AMP
+
+model:
+  n_mels: 80
+  d_model: 144
+  num_heads: 4
+  ffn_dim: 576
+  num_layers: 16
+  conv_kernel: 31
+  dropout: 0.1
+  vocab_size: 1001
+
+train:
+  stage: pretrain
+  optimizer: {lr_peak: 1.0e-3, betas: [0.9, 0.98], eps: 1.0e-9, weight_decay: 1.0e-6}
+  warmup_steps: 10000      # ~15 epochs at ~650 steps/epoch on 65 h (25k would be ~38 epochs)
+  max_epochs: 100
+  amp: true
+  grad_clip: 5.0
+  # off for the first 4000 steps so CTC can find alignments before the input gets masked
+  spec_augment: {freq_masks: 2, freq_width: 27, time_masks: 10, time_width_ratio: 0.05, start_step: 4000}
+  # std 0.075 (LSTM-recipe value) exceeds this model's weight std (0.066) and collapsed training to
+  # WER 100% at step 10k. Measured on the epoch-15 model: std 0.01 -> WER 37.5% to 38.6%, 0.075 -> 100%.
+  variational_noise: {std: 0.01, start_step: 10000}
+  ckpt_dir: checkpoints/asr

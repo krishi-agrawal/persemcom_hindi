@@ -1,0 +1,46 @@
+# Speaker-conditioned Tacotron 2 (paper Sec. IV-E, Fig. 5) predicting Vocos 24 kHz mels.
+data:
+  train_manifest: manifests/train.jsonl
+  val_manifest: manifests/val.jsonl
+  mel_dir: features/mel24
+  vocab: artifacts/tts_graphemes.json      # built from train transcripts on first run
+  speaker_kb: artifacts/speaker_kb.npz     # from scripts/07_train_speaker.py
+  max_duration: 10.0
+  # The decoder loop is launch-bound, not compute-bound: 200 s batches ran 4.4-7.7 s/step at 2.5 GB,
+  # 800 s batches 8.7-11.8 s/step at 7 GB (A2000, GPU shared) -> ~2.3x samples/s. Needs the GPU to itself.
+  max_batch_seconds: 800
+model:
+  n_mels: 100
+  speaker_dim: 256
+  # Reduction factor r=3. Run 2 (r=2) aligned but its free-running output droned: frame-to-frame change
+  # 0.118 vs 0.459 for real speech, ASR WER 94% (teacher-forced 40%). The decoder was continuing its own
+  # previous frame; predicting 3 frames per step makes that shortcut less useful. Run 3 starts from run 2's
+  # step-8000 weights (checkpoints/tts_run2_r2/last.pt) except the r-dependent prenet input and projection.
+  frames_per_step: 3
+  decoder_max_step: 700    # 700 steps x 3 frames x 256/24000 s = 22 s
+  # r=3 alone still droned at step 1500 (frame change 0.108 vs 0.459 real). From run 3's step 1500 on,
+  # 30% of teacher-forced input frame groups are replaced by the utterance mean during training.
+  input_frame_dropout: 0.3
+train:
+  lr: 1.0e-3
+  warmup_steps: 300
+  lr_decay_start: 6000
+  lr_decay_rate: 0.5
+  lr_min: 1.0e-5
+  weight_decay: 1.0e-6
+  grad_clip: 1.0
+  gate_pos_weight: 5.0
+  # Per-step-normalized guided attention (see guided_attention_loss), kept on for the whole run. Run 1 used
+  # per-cell normalization (~80x weaker) and switched it off at 4000: attention never left the first
+  # characters (14% coverage, free-running ASR WER 97-99% at step 5000). Backup: checkpoints/tts_run1_weakGA
+  guided_attn_weight: 1.0
+  guided_attn_until: 1000000
+  steps: 10000             # run 3 (fresh step counter, warm-started weights)
+  eval_every: 500
+  val_utts: 200
+  workers: 4
+  ckpt_dir: checkpoints/tts
+finetune:   # Algorithm 1 lines 12-15: corrected transcripts T_C as input, true mels as target
+  lr: 1.0e-4
+  steps: 1500
+  ckpt_dir: checkpoints/tts_finetune

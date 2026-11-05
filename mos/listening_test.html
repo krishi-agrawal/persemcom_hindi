@@ -1,0 +1,421 @@
+<title>Hindi Speech Listening Test</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600&family=Tiro+Devanagari+Hindi&display=swap">
+<style>
+/* Layout: one narrow column, one clip at a time; the two P.800 scales sit side by side on wide screens. */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --ink: #18202c; --muted: #586273; --line: #d9dee6;
+  --accent: #2b55c9; --accent-ink: #ffffff; --accent-soft: #e7edfb; --warn: #8a5a00; --warn-soft: #fbf1dc;
+  --good: #1f7a4a;
+  --display: "Tiro Devanagari Hindi", "Noto Serif Devanagari", Georgia, serif;
+  --body: "Hind", "Noto Sans Devanagari", "Segoe UI", system-ui, sans-serif;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11151b; --surface: #1a2029; --ink: #e8ecf2; --muted: #9ba5b4; --line: #2b333f;
+  --accent: #7f9cff; --accent-ink: #0d1220; --accent-soft: #1e2943; --warn: #f0c36a; --warn-soft: #33290f;
+  --good: #6fd19c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11151b; --surface: #1a2029; --ink: #e8ecf2; --muted: #9ba5b4; --line: #2b333f;
+  --accent: #7f9cff; --accent-ink: #0d1220; --accent-soft: #1e2943; --warn: #f0c36a; --warn-soft: #33290f;
+  --good: #6fd19c; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 20px; }
+h1, h2 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: 2rem; } h2 { font-size: 1.35rem; }
+p { margin: 0; } .hi { font-family: var(--body); }
+.muted { color: var(--muted); } .small { font-size: .9rem; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 14px; min-width: 0; }
+.eyebrow { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+button { font: inherit; cursor: pointer; }
+.btn { border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); border-radius: 8px; padding: 10px 18px; font-weight: 600; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:focus-visible, .opt:focus-within, .play:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.check { display: flex; gap: 10px; align-items: flex-start; }
+.check input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--accent); }
+.banner { background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 10px 14px; font-size: .92rem; }
+.progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.progress > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+.player { display: flex; gap: 16px; align-items: center; }
+.play { width: 64px; height: 64px; border-radius: 50%; border: none; background: var(--accent); color: var(--accent-ink); flex: none; display: grid; place-items: center; }
+.play svg { width: 26px; height: 26px; fill: currentColor; }
+.track { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.bar { height: 8px; border-radius: 4px; background: var(--accent-soft); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--accent); }
+.scales { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .scales { grid-template-columns: 1fr; } h1 { font-size: 1.6rem; } }
+fieldset { border: 1px solid var(--line); border-radius: var(--radius); margin: 0; padding: 14px; display: grid; gap: 8px; min-width: 0; }
+fieldset:disabled { opacity: .5; }
+legend { padding: 0 6px; font-weight: 600; }
+legend .hi { display: block; font-weight: 500; color: var(--muted); }
+.opt { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt .n { font-weight: 600; font-variant-numeric: tabular-nums; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.opt .en { display: block; font-weight: 500; line-height: 1.3; }
+.opt .hi { display: block; color: var(--muted); font-size: .92rem; line-height: 1.35; }
+.opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.opt:has(input:checked) .n { background: var(--accent); color: var(--accent-ink); }
+.examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.ex { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; gap: 12px; align-items: center; }
+.ex .play { width: 44px; height: 44px; } .ex .play svg { width: 18px; height: 18px; }
+.ex.heard { border-color: var(--good); }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .92rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; }
+.scroll { overflow-x: auto; }
+textarea { width: 100%; min-height: 120px; font: 12px/1.4 ui-monospace, Consolas, monospace; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px; box-sizing: border-box; }
+@media (prefers-reduced-motion: reduce) { .progress > i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:6px">
+    <span class="eyebrow">Listening test · श्रवण परीक्षण</span>
+    <h1>हिंदी वाक् श्रवण परीक्षण</h1>
+    <p class="muted">Rate short Hindi speech clips for distortion and listening effort (ITU-T P.800). About 12 minutes.</p>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <!-- intro -->
+  <section id="v-intro" class="panel">
+    <h2>Before you start · शुरू करने से पहले</h2>
+    <p>You will hear 42 short Hindi sentences, one at a time. Some are natural recordings and some are generated by a machine. Listen to each clip to the end, then answer two questions about it. You can replay a clip as often as you like.</p>
+    <p class="hi muted">आप एक-एक करके 42 छोटे हिंदी वाक्य सुनेंगे। कुछ असली रिकॉर्डिंग हैं, कुछ मशीन से बनाए गए हैं। हर क्लिप को पूरा सुनें, फिर उसके बारे में दो सवालों के जवाब दें। आप क्लिप को जितनी बार चाहें दोबारा सुन सकते हैं।</p>
+    <p>Rate each clip on its own; there are no right answers. Your progress is saved, so you can stop and come back.</p>
+    <label class="check"><input type="checkbox" id="c-head"><span>I am using headphones in a quiet place. <span class="hi muted">मैं शांत जगह पर हेडफ़ोन से सुन रहा/रही हूँ।</span></span></label>
+    <label class="check"><input type="checkbox" id="c-native"><span>Hindi is my first language. <span class="hi muted">हिंदी मेरी मातृभाषा है।</span></span></label>
+    <div class="row"><button class="btn" id="b-start" disabled>Continue · आगे बढ़ें</button><span id="resume-note" class="muted small"></span></div>
+  </section>
+
+  <!-- calibration -->
+  <section id="v-calib" class="panel" hidden>
+    <h2>Three example clips · तीन उदाहरण</h2>
+    <p>These show the range of quality you will hear, from best to worst. They are not rated. Listen to all three, then start.</p>
+    <p class="hi muted">ये उदाहरण दिखाते हैं कि आगे आवाज़ की गुणवत्ता कितनी अच्छी से कितनी ख़राब तक होगी। इन्हें रेट नहीं करना है। तीनों सुनें, फिर शुरू करें।</p>
+    <div class="examples" id="examples"></div>
+    <div class="row"><button class="btn" id="b-calib" disabled>Start rating · रेटिंग शुरू करें</button></div>
+  </section>
+
+  <!-- trial -->
+  <section id="v-trial" class="panel" hidden>
+    <div class="row" style="justify-content:space-between"><span class="eyebrow" id="t-count">Clip 1 of 42</span><span class="muted small" id="t-saved"></span></div>
+    <div class="progress"><i id="t-prog"></i></div>
+    <div class="player">
+      <button class="play" id="t-play" aria-label="Play clip"><svg viewBox="0 0 24 24" id="t-icon"><path d="M8 5v14l11-7z"/></svg></button>
+      <div class="track"><div class="bar"><i id="t-bar"></i></div><span class="muted small" id="t-hint">Press play and listen to the end · पूरा सुनें</span></div>
+    </div>
+    <div class="scales">
+      <fieldset id="f-d" disabled>
+        <legend>How much distortion do you hear?<span class="hi">आवाज़ में कितनी गड़बड़ी सुनाई देती है?</span></legend>
+      </fieldset>
+      <fieldset id="f-i" disabled>
+        <legend>How much effort to understand the meaning?<span class="hi">अर्थ समझने में कितनी मेहनत लगी?</span></legend>
+      </fieldset>
+    </div>
+    <div class="row" style="justify-content:space-between">
+      <button class="btn ghost" id="b-back">Back · पीछे</button>
+      <button class="btn" id="b-next" disabled>Next · अगला</button>
+    </div>
+  </section>
+
+  <!-- done -->
+  <section id="v-done" class="panel" hidden>
+    <h2>Thank you · धन्यवाद</h2>
+    <p id="done-msg">All 42 clips are rated and saved.</p>
+    <div id="export" hidden style="display:grid;gap:10px">
+      <p>Your ratings could not be saved to the shared sheet. Copy them and send them to the person who invited you.</p>
+      <textarea id="export-text" readonly></textarea>
+      <div class="row"><button class="btn" id="b-copy">Copy ratings</button><span id="copy-msg" class="muted small"></span></div>
+    </div>
+  </section>
+
+  <!-- organizer results -->
+  <section id="v-results" class="panel" hidden>
+    <div class="row" style="justify-content:space-between">
+      <h2>Results so far</h2>
+      <div class="row"><button class="btn ghost" id="b-csv">Copy CSV</button><button class="btn" id="b-refresh">Refresh</button></div>
+    </div>
+    <p class="muted small" id="r-summary">Only you and editors see this section. Listeners see only the test.</p>
+    <div class="scroll"><table id="r-table"></table></div>
+    <p class="muted small">MOS = mean of 1-5 ratings, ± half-width of the 95% confidence interval. AMR-WB + LDPC and Txt2Vid-style at 2 dB and below delivered no speech and score 1 by definition; they are not played.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  const SCALES = {
+    d: [[5, "Imperceptible", "कोई गड़बड़ी सुनाई नहीं देती"], [4, "Just perceptible, not annoying", "मुश्किल से सुनाई देती है, परेशान नहीं करती"],
+        [3, "Perceptible, slightly annoying", "सुनाई देती है, थोड़ा परेशान करती है"], [2, "Annoying, not objectionable", "परेशान करती है, पर सहनीय है"],
+        [1, "Very annoying, objectionable", "बहुत परेशान करती है, असहनीय"]],
+    i: [[5, "No effort required", "कोई मेहनत नहीं, पूरी तरह आराम से"], [4, "Attention needed, no real effort", "ध्यान देना पड़ा, पर ख़ास मेहनत नहीं"],
+        [3, "Moderate effort", "थोड़ी मेहनत लगी"], [2, "Considerable effort", "काफ़ी मेहनत लगी"],
+        [1, "Meaning not understood", "मेहनत के बाद भी अर्थ समझ नहीं आया"]],
+  };
+  const PER_CONDITION = 3;
+  const $ = id => document.getElementById(id);
+  const LS = "mos-hi-v1";
+  const PLAY = '<path d="M8 5v14l11-7z"/>', PAUSE = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
+
+  let set = null, db = null, uid = null, docRef = null, canSave = false, docExists = false;
+  let state = { assign: [], ratings: {}, headphones: false, native: false };
+  let pos = 0, heard = false, playStart = 0;
+  const audio = new Audio();
+  audio.preload = "auto";
+
+  function show(view) {
+    for (const v of ["intro", "calib", "trial", "done"]) $("v-" + v).hidden = v !== view;
+    window.scrollTo({ top: 0 });
+  }
+  function banner(msg) { $("banner").textContent = msg; $("banner").hidden = !msg; }
+  function saveLocal() { try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} }
+  function loadLocal() { try { return JSON.parse(localStorage.getItem(LS) || "null"); } catch (e) { return null; } }
+
+  // deterministic per listener: a seeded sentence permutation, PER_CONDITION sentences per condition, shuffled order
+  function rng(seedStr) {
+    let h = 2166136261;
+    for (const c of seedStr) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+    return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
+  }
+  function shuffle(a, r) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function makeAssignment(seed) {
+    const r = rng(seed), sents = shuffle(set.sentences.slice(), r), out = [];
+    set.conditions.forEach((c, ci) => {
+      for (let k = 0; k < PER_CONDITION; k++) {
+        const s = sents[(ci * PER_CONDITION + k) % sents.length];
+        const clip = set.clips.find(x => !x.calibration && x.cond === c.id && x.sentence === s);
+        if (clip) out.push(clip.file);
+      }
+    });
+    shuffle(out, r);
+    for (let i = 1; i < out.length; i++) {  // avoid the same sentence twice in a row
+      const sent = f => set.clips.find(x => x.file === f).sentence;
+      if (sent(out[i]) === sent(out[i - 1])) { const j = (i + 2) % out.length; [out[i], out[j]] = [out[j], out[i]]; }
+    }
+    return out;
+  }
+  const keyOf = file => file.replace(/^audio\//, "").replace(/\.mp3$/, "");
+
+  async function persist(patch) {
+    for (const [k, v] of Object.entries(patch)) state[k] = k === "ratings" ? { ...state.ratings, ...v } : v;
+    saveLocal();
+    if (!canSave) return;
+    try {
+      await docRef.update({ ...patch, updatedAt: new Date().toISOString() });
+      $("t-saved").textContent = "Saved · सहेजा गया";
+    } catch (e) {
+      if (e && e.code === "unavailable") {
+        await new Promise(r => setTimeout(r, 800 + Math.random() * 800));
+        try { await docRef.update({ ...patch, updatedAt: new Date().toISOString() }); return; } catch (e2) {}
+      }
+      canSave = false;
+      banner("Your ratings are being kept on this device only. At the end you can copy them and send them to the organizer.");
+    }
+  }
+
+  // ---------- intro ----------
+  function syncStart() { $("b-start").disabled = !($("c-head").checked && $("c-native").checked); }
+  $("c-head").addEventListener("change", syncStart);
+  $("c-native").addEventListener("change", syncStart);
+  $("b-start").addEventListener("click", async () => {
+    if (!state.assign.length) state.assign = makeAssignment(uid || (Math.random().toString(36).slice(2)));
+    if (canSave && !docExists) {
+      {
+        try {
+          await docRef.set({ assign: state.assign, ratings: state.ratings, headphones: true, native: true,
+                             startedAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+          docExists = true;
+        } catch (e) { canSave = false; banner("Your ratings are being kept on this device only. At the end you can copy them and send them to the organizer."); }
+      }
+    }
+    await persist({ headphones: true, native: true });
+    const done = Object.keys(state.ratings).length;
+    if (done >= state.assign.length) return finish();
+    if (done > 0) { pos = firstUnrated(); return startTrial(); }
+    renderCalibration();
+    show("calib");
+  });
+
+  // ---------- calibration ----------
+  function renderCalibration() {
+    const box = $("examples"); box.textContent = "";
+    const ex = set.clips.filter(c => c.calibration);
+    const order = ["orig", "amr_r10", "ps_r-10"];
+    ex.sort((a, b) => order.indexOf(a.cond) - order.indexOf(b.cond));
+    const heardSet = new Set();
+    ex.forEach((c, i) => {
+      const el = document.createElement("div"); el.className = "ex";
+      const b = document.createElement("button"); b.className = "play"; b.setAttribute("aria-label", "Play example " + (i + 1));
+      b.innerHTML = '<svg viewBox="0 0 24 24">' + PLAY + "</svg>";
+      const t = document.createElement("div");
+      t.innerHTML = "<strong>Example " + "ABC"[i] + "</strong><br><span class='muted small'>" + c.duration.toFixed(1) + " s</span>";
+      el.append(b, t); box.append(el);
+      b.addEventListener("click", () => {
+        audio.src = c.file; audio.currentTime = 0; audio.play().catch(() => {});
+        audio.onended = () => { heardSet.add(i); el.classList.add("heard"); $("b-calib").disabled = heardSet.size < ex.length; };
+      });
+    });
+  }
+  $("b-calib").addEventListener("click", () => { pos = 0; startTrial(); });
+
+  // ---------- trial ----------
+  function buildScale(name) {
+    const fs = $("f-" + name);
+    for (const [n, en, hi] of SCALES[name]) {
+      const lab = document.createElement("label"); lab.className = "opt";
+      lab.innerHTML = `<input type="radio" name="${name}" value="${n}" id="${name}${n}"><span class="n">${n}</span><span><span class="en"></span><span class="hi"></span></span>`;
+      lab.querySelector(".en").textContent = en; lab.querySelector(".hi").textContent = hi;
+      fs.append(lab);
+    }
+    fs.addEventListener("change", syncNext);
+  }
+  const picked = name => { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? Number(el.value) : null; };
+  function syncNext() { $("b-next").disabled = !(heard && picked("d") && picked("i")); }
+  function firstUnrated() { const i = state.assign.findIndex(f => !state.ratings[keyOf(f)]); return i < 0 ? state.assign.length : i; }
+
+  function startTrial() {
+    show("trial");
+    const file = state.assign[pos], prev = state.ratings[keyOf(file)];
+    $("t-count").textContent = `Clip ${pos + 1} of ${state.assign.length} · क्लिप ${pos + 1} / ${state.assign.length}`;
+    $("t-prog").style.width = (100 * Object.keys(state.ratings).length / state.assign.length) + "%";
+    $("t-saved").textContent = "";
+    for (const n of ["d", "i"]) document.querySelectorAll(`input[name="${n}"]`).forEach(x => { x.checked = prev ? Number(x.value) === prev[n] : false; });
+    heard = !!prev;
+    $("f-d").disabled = $("f-i").disabled = !heard;
+    $("t-hint").textContent = heard ? "Replay if you like · चाहें तो दोबारा सुनें" : "Press play and listen to the end · पूरा सुनें";
+    $("b-back").disabled = pos === 0;
+    $("t-bar").style.width = "0";
+    audio.pause(); audio.onended = null; audio.src = file; audio.currentTime = 0;
+    $("t-icon").innerHTML = PLAY;
+    playStart = 0;
+    syncNext();
+    const next = state.assign[pos + 1];
+    if (next) { const pre = new Audio(); pre.preload = "auto"; pre.src = next; }
+  }
+  $("t-play").addEventListener("click", () => {
+    if (!audio.paused) { audio.pause(); return; }
+    if (audio.ended) audio.currentTime = 0;
+    if (!playStart) playStart = Date.now();
+    audio.play().catch(() => banner("The clip could not play. Check your connection and press play again."));
+  });
+  audio.addEventListener("play", () => { $("t-icon").innerHTML = PAUSE; });
+  audio.addEventListener("pause", () => { $("t-icon").innerHTML = PLAY; });
+  audio.addEventListener("timeupdate", () => { if (audio.duration) $("t-bar").style.width = (100 * audio.currentTime / audio.duration) + "%"; });
+  audio.addEventListener("ended", () => {
+    if ($("v-trial").hidden) return;
+    heard = true; $("f-d").disabled = $("f-i").disabled = false;
+    $("t-hint").textContent = "Now rate the clip · अब रेट करें";
+    syncNext();
+  });
+  $("b-next").addEventListener("click", async () => {
+    const file = state.assign[pos];
+    const r = { d: picked("d"), i: picked("i"), ms: playStart ? Date.now() - playStart : 0, at: new Date().toISOString() };
+    $("b-next").disabled = true;
+    await persist({ ratings: { [keyOf(file)]: r } });
+    pos = firstUnrated();
+    if (pos >= state.assign.length) return finish();
+    startTrial();
+  });
+  $("b-back").addEventListener("click", () => { if (pos > 0) { pos--; startTrial(); } });
+  document.addEventListener("keydown", e => {
+    if ($("v-trial").hidden || e.target.tagName === "BUTTON" || e.target.tagName === "TEXTAREA") return;
+    if (e.code === "Space") { e.preventDefault(); $("t-play").click(); }
+  });
+
+  // ---------- done ----------
+  async function finish() {
+    audio.pause();
+    show("done");
+    await persist({ done: true });
+    if (!canSave) {
+      $("done-msg").textContent = "All clips are rated.";
+      $("export").hidden = false;
+      $("export-text").value = JSON.stringify({ listener: uid, headphones: state.headphones, native: state.native,
+        ratings: state.assign.map(f => ({ file: f, ...state.ratings[keyOf(f)] })) });
+    }
+  }
+  $("b-copy").addEventListener("click", () => {
+    const t = $("export-text");
+    navigator.clipboard.writeText(t.value).then(() => { $("copy-msg").textContent = "Copied"; })
+      .catch(() => { t.focus(); t.select(); $("copy-msg").textContent = "Press Ctrl+C to copy"; });
+  });
+
+  // ---------- organizer view ----------
+  let lastCsv = "";
+  function ci95(xs) {
+    const n = xs.length, m = xs.reduce((a, b) => a + b, 0) / n;
+    const sd = n > 1 ? Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / (n - 1)) : 0;
+    return [m, n > 1 ? 1.96 * sd / Math.sqrt(n) : 0];
+  }
+  async function loadResults() {
+    $("r-summary").textContent = "Loading…";
+    let docs;
+    try { docs = (await db.collection("mos").get()).docs.map(d => d.data()); }
+    catch (e) { $("r-summary").textContent = "Could not load the ratings right now. Press Refresh to try again."; return; }
+    const byFile = Object.fromEntries(set.clips.map(c => [keyOf(c.file), c]));
+    const acc = {};
+    let n = 0, listeners = 0, finished = 0;
+    for (const d of docs) {
+      const rs = Object.entries(d.ratings || {});
+      if (rs.length) listeners++;
+      if (d.done) finished++;
+      for (const [k, r] of rs) {
+        const c = byFile[k]; if (!c) continue;
+        (acc[c.cond] ||= { d: [], i: [] }); acc[c.cond].d.push(r.d); acc[c.cond].i.push(r.i); n++;
+      }
+    }
+    $("r-summary").textContent = `${listeners} listener${listeners === 1 ? "" : "s"} (${finished} finished), ${n} ratings.`;
+    const tbl = $("r-table"); tbl.textContent = "";
+    const head = tbl.insertRow();
+    for (const h of ["System", "Channel", "SNR", "MOS distortion", "MOS effort", "Ratings"]) { const th = document.createElement("th"); th.textContent = h; head.append(th); }
+    const csv = [["condition", "system", "channel", "snr_db", "mos_d", "ci_d", "mos_i", "ci_i", "n"]];
+    for (const c of set.conditions) {
+      const a = acc[c.id], tr = tbl.insertRow();
+      const [md, hd] = a ? ci95(a.d) : [NaN, 0], [mi, hi] = a ? ci95(a.i) : [NaN, 0];
+      const fmt = (m, h) => isNaN(m) ? "–" : `${m.toFixed(2)} ± ${h.toFixed(2)}`;
+      for (const v of [c.system, c.channel || "–", c.snr_db === null ? "–" : c.snr_db + " dB", fmt(md, hd), fmt(mi, hi), a ? a.d.length : 0]) tr.insertCell().textContent = v;
+      csv.push([c.id, c.system, c.channel, c.snr_db ?? "", md, hd, mi, hi, a ? a.d.length : 0]);
+    }
+    lastCsv = csv.map(r => r.map(v => typeof v === "number" ? (isNaN(v) ? "" : +v.toFixed(3)) : `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  }
+  $("b-refresh").addEventListener("click", loadResults);
+  $("b-csv").addEventListener("click", () => {
+    navigator.clipboard.writeText(lastCsv).then(() => { $("b-csv").textContent = "Copied"; setTimeout(() => { $("b-csv").textContent = "Copy CSV"; }, 1500); })
+      .catch(() => banner("Copy is blocked in this view. Ask Claude to export the results instead."));
+  });
+
+  // ---------- boot ----------
+  buildScale("d"); buildScale("i");
+  async function boot() {
+    try { set = await (await fetch("clips.json")).json(); }
+    catch (e) { banner("The clip list could not load. Reload the page to try again."); return; }
+    const local = loadLocal();
+    if (local && local.assign && local.assign.length) state = local;
+    const c = window.claude;
+    const [dbNs, user] = c && c.use ? await Promise.all([c.use("db"), c.use("user")]) : [null, null];
+    db = dbNs;
+    uid = user ? await user.id() : null;
+    if (db && uid) {
+      docRef = db.doc("mos/" + uid);
+      try {
+        const snap = await docRef.get();
+        docExists = snap.exists;
+        if (snap.exists) { const d = snap.data(); state = { assign: d.assign || [], ratings: { ...(d.ratings || {}) }, headphones: !!d.headphones, native: !!d.native }; }
+        canSave = true;
+      } catch (e) { canSave = false; }
+    }
+    if (!canSave) banner("Ratings will be kept on this device only. At the end you can copy them and send them to the organizer.");
+    const done = Object.keys(state.ratings).length;
+    if (state.assign.length && done) $("resume-note").textContent = `Welcome back: ${done} of ${state.assign.length} clips rated.`;
+    if (state.headphones) $("c-head").checked = true;
+    if (state.native) $("c-native").checked = true;
+    syncStart();
+    if (db && user && await user.canEdit()) { $("v-results").hidden = false; loadResults(); }
+  }
+  boot();
+})();
+</script>

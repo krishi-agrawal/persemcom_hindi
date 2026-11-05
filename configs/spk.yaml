@@ -1,0 +1,23 @@
+# GE2E speaker encoder (paper Sec. IV-E.1) and the speaker knowledge base.
+# Input reuses the cached 80-d ASR fbank (16 kHz, 10 ms); generated speech is featurized with the same
+# persemcom.data.features.asr_fbank, so original and reconstructed embeddings are directly comparable.
+data:
+  train_manifest: manifests/train.jsonl
+  val_manifest: manifests/val.jsonl
+  feat_dir: features/fbank
+  cmvn: artifacts/fbank_cmvn.npz
+model:
+  n_mels: 80
+  hidden: 768
+  layers: 3
+  emb_dim: 256
+train:
+  n_speakers: 64     # N
+  n_utts: 10         # M (every train speaker has >= 18 utterances)
+  lr: 1.0e-4
+  steps: 10000       # closed-set EER was already 7.1% after 300 steps in the smoke test; ~1 s/step
+  eval_every: 1000
+  workers: 4
+  ckpt_dir: checkpoints/speaker
+kb:
+  out: artifacts/speaker_kb.npz
